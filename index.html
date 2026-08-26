@@ -1,117 +1,293 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Peter</title>
-    <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Peter AI</title>
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
 
     <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <link rel="stylesheet" href="style.css">
+
 </head>
+
+
 <body>
 
 <div class="container">
 
-    <aside class="sidebar">
 
-        <h2>🤖 Peter</h2>
+    <!-- ==========================
+         SIDEBAR
+    =========================== -->
 
-       <button id="new-chat-btn">
-    <i class="fa-solid fa-plus"></i>
-    New Chat
-</button>
+    <aside class="sidebar" id="sidebar">
 
-<button id="history-btn">
-    <i class="fa-solid fa-clock"></i>
-    History
-</button>
+        <div class="sidebar-top">
 
-<button id="files-btn">
-    <i class="fa-solid fa-folder"></i>
-    Files
-</button>
+            <div class="brand">
 
-<button id="voice-sidebar-btn">
-    <i class="fa-solid fa-microphone"></i>
-    Voice
-</button>
-<button>
-    <i class="fa-solid fa-gear"></i>
-    Settings
-</button>
+                <div class="brand-icon">
+                    P
+                </div>
+
+                <span>Peter</span>
+
+            </div>
+
+
+            <button
+                id="new-chat-btn"
+                class="new-chat"
+            >
+
+                <i class="fa-solid fa-plus"></i>
+
+                <span>New chat</span>
+
+            </button>
+
+
+            <nav class="sidebar-nav">
+
+                <button id="history-btn">
+
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+
+                    <span>History</span>
+
+                </button>
+
+
+                <button id="files-btn">
+
+                    <i class="fa-solid fa-folder"></i>
+
+                    <span>Files</span>
+
+                </button>
+
+
+                <button id="voice-sidebar-btn">
+
+                    <i class="fa-solid fa-microphone"></i>
+
+                    <span>Voice</span>
+
+                </button>
+
+
+                <button id="settings-btn">
+
+                    <i class="fa-solid fa-gear"></i>
+
+                    <span>Settings</span>
+
+                </button>
+
+            </nav>
+
+        </div>
+
+
+        <!-- PROFILE -->
+
         <div class="profile">
 
-    <div class="avatar">P</div>
+            <div class="avatar">
+                P
+            </div>
 
-    <div>
+            <div class="profile-info">
 
-        <h3>Peter</h3>
+                <strong>Peter</strong>
 
-        <p>Developer</p>
+                <span>AI Assistant</span>
 
-    </div>
+            </div>
 
-</div>
+            <i class="fa-solid fa-ellipsis"></i>
+
+        </div>
 
     </aside>
 
-    <div class="app">
 
-    <!-- Header -->
-    <header>
-        <div class="header-top">
 
-    <button id="menu-btn">☰</button>
+    <!-- ==========================
+         MAIN APP
+    =========================== -->
 
-    <div class="header-title">
+    <section class="app">
 
-    <h1>🤖 Peter</h1>
 
-    <button id="theme-btn">🌙</button>
+        <!-- HEADER -->
 
-</div>
+        <header>
 
-</div>
-        <p>Intelligence.
-            Simplified.
-        </p>
-    </header>
+            <div class="header-left">
 
-    <!-- Chat Area -->
-    <main id="chat-box">
+                <button
+                    id="menu-btn"
+                    class="icon-btn"
+                >
 
-        <div class="message ai">
-            <div class="bubble">
-               👋 Welcome back! i'm  <strong>Peter</strong>.<br>
-                 Ask me anything!
+                    <i class="fa-solid fa-bars"></i>
+
+                </button>
+
+
+                <div class="model-info">
+
+                    <div class="model-name">
+
+                        Peter
+
+                        <i class="fa-solid fa-chevron-down"></i>
+
+                    </div>
+
+                    <div class="status">
+
+                        <span class="status-dot"></span>
+
+                        Online
+
+                    </div>
+
+                </div>
+
             </div>
-        </div>
 
-    </main>
 
-    <!-- Input Area -->
-    <footer>
+            <button
+                id="theme-btn"
+                class="theme-btn"
+            >
 
-        <input
-            type="text"
-            id="user-input"
-            placeholder="Type your message..."
-        >
+                <i class="fa-solid fa-moon"></i>
 
-        <button id="voice-btn">🎤</button>
-        <button id="send-btn">➤</button>
+            </button>
 
-    </footer>
+        </header>
 
-    </div>
+
+
+        <!-- ==========================
+             CHAT
+        =========================== -->
+
+        <main id="chat-box">
+
+            <div class="welcome">
+
+                <div class="welcome-icon">
+                    P
+                </div>
+
+                <h1>
+                    How can I help you today?
+                </h1>
+
+                <p>
+                    I'm Peter, your personal AI assistant.
+                </p>
+
+            </div>
+
+
+            <div class="message ai">
+
+                <div class="bubble">
+
+                    👋 Welcome! I'm
+                    <strong>Peter</strong>.
+
+                    <br>
+
+                    Ask me anything and let's get started.
+
+                </div>
+
+            </div>
+
+        </main>
+
+
+
+        <!-- ==========================
+             INPUT
+        =========================== -->
+
+        <footer>
+
+            <div class="composer">
+
+                <button
+                    id="voice-btn"
+                    class="composer-btn"
+                    title="Voice input"
+                >
+
+                    <i class="fa-solid fa-microphone"></i>
+
+                </button>
+
+
+                <input
+                    type="text"
+                    id="user-input"
+                    placeholder="Message Peter..."
+                    autocomplete="off"
+                >
+
+
+                <button
+                    id="send-btn"
+                    class="send-btn"
+                    title="Send message"
+                >
+
+                    <i class="fa-solid fa-arrow-up"></i>
+
+                </button>
+
+            </div>
+
+
+            <p class="footer-note">
+
+                Peter can make mistakes. Check important information.
+
+            </p>
+
+        </footer>
+
+
+    </section>
 
 </div>
 
-<script src="config.js"></script>
+
 <script src="script.js"></script>
 
 </body>
+
 </html>
