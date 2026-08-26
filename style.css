@@ -70,28 +70,32 @@ body {
    SIDEBAR
 ========================== */
 
-.sidebar {
+.sidebar{
+    width:240px;
+    background:#111827;
+    border-radius:0 20px 20px 0;
+    padding:25px;
+    display:flex;
+    flex-direction:column;
 
-    width: 270px;
+    /* Leave the header/menu area visible */
+    margin-top:70px;
 
-    height: 100vh;
+    height:calc(100% - 70px);
 
-    background: var(--sidebar);
+    position:fixed;
+    left:0;
+    top:0;
+    z-index:1000;
 
-    border-right: 1px solid var(--border);
-
-    padding: 18px;
-
-    display: flex;
-
-    flex-direction: column;
-
-    justify-content: space-between;
-
-    transition: .3s ease;
-
+    overflow-y:auto;
+    
 }
 
+#menu-btn{
+    position:relative;
+    z-index:1100;
+}
 
 .sidebar-top {
 

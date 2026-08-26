@@ -1,3 +1,7 @@
+// ==========================
+// ELEMENTS
+// ==========================
+
 const chatBox = document.getElementById("chat-box");
 const input = document.getElementById("user-input");
 const sendBtn = document.getElementById("send-btn");
@@ -7,6 +11,7 @@ const menuBtn = document.getElementById("menu-btn");
 const sidebar = document.querySelector(".sidebar");
 const themeBtn = document.getElementById("theme-btn");
 const voiceBtn = document.getElementById("voice-btn");
+const voiceSidebarBtn = document.getElementById("voice-sidebar-btn");
 
 
 // ==========================
@@ -15,13 +20,16 @@ const voiceBtn = document.getElementById("voice-btn");
 
 sendBtn.addEventListener("click", sendMessage);
 
+
 input.addEventListener("keypress", function (e) {
 
     if (e.key === "Enter") {
+        e.preventDefault();
         sendMessage();
     }
 
 });
+
 
 input.addEventListener("keydown", function (e) {
 
@@ -32,11 +40,18 @@ input.addEventListener("keydown", function (e) {
 });
 
 
+// ==========================
+// SEND MESSAGE FUNCTION
+// ==========================
+
 async function sendMessage() {
 
     const text = input.value.trim();
 
     if (text === "") return;
+
+    // Stop Peter speaking if a new message is sent
+    stopSpeaking();
 
     addMessage(text, "user");
 
@@ -52,6 +67,9 @@ async function sendMessage() {
 
         addMessage(reply, "ai");
 
+        // Peter speaks the response
+        speakReply(reply);
+
     }
 
     catch (error) {
@@ -60,10 +78,10 @@ async function sendMessage() {
 
         removeTyping();
 
-        addMessage(
-            "⚠️ Sorry, I couldn't connect to PFX AI.",
-            "ai"
-        );
+        const errorMessage =
+            "⚠️ Sorry, I couldn't connect to Peter AI.";
+
+        addMessage(errorMessage, "ai");
 
     }
 
@@ -125,9 +143,11 @@ function addMessage(message, sender) {
 
     const now = new Date();
 
+
     const time = now.toLocaleTimeString([], {
 
         hour: "2-digit",
+
         minute: "2-digit"
 
     });
@@ -136,12 +156,14 @@ function addMessage(message, sender) {
     const messageDiv =
         document.createElement("div");
 
+
     messageDiv.className =
         `message ${sender}`;
 
 
     const bubble =
         document.createElement("div");
+
 
     bubble.className =
         "bubble";
@@ -154,6 +176,7 @@ function addMessage(message, sender) {
     const timeDiv =
         document.createElement("div");
 
+
     timeDiv.className =
         "time";
 
@@ -164,9 +187,12 @@ function addMessage(message, sender) {
 
     bubble.appendChild(timeDiv);
 
+
     messageDiv.appendChild(bubble);
 
+
     chatBox.appendChild(messageDiv);
+
 
     chatBox.scrollTop =
         chatBox.scrollHeight;
@@ -186,8 +212,10 @@ function showTyping() {
     const typing =
         document.createElement("div");
 
+
     typing.className =
         "message ai";
+
 
     typing.id =
         "typing";
@@ -208,6 +236,7 @@ function showTyping() {
 
     chatBox.appendChild(typing);
 
+
     chatBox.scrollTop =
         chatBox.scrollHeight;
 
@@ -221,7 +250,9 @@ function removeTyping() {
 
 
     if (typing) {
+
         typing.remove();
+
     }
 
 }
@@ -233,18 +264,45 @@ function removeTyping() {
 
 newChatBtn.addEventListener("click", () => {
 
+    // Stop voice
+    stopSpeaking();
+
+    // Stop listening
+    stopListening();
+
+
     localStorage.removeItem("pfxChat");
 
 
     chatBox.innerHTML = `
 
+        <div class="welcome">
+
+            <div class="welcome-icon">
+                P
+            </div>
+
+            <h1>
+                How can I help you today?
+            </h1>
+
+            <p>
+                I'm Peter, your personal AI assistant.
+            </p>
+
+        </div>
+
+
         <div class="message ai">
 
             <div class="bubble">
 
-                👋 Welcome back! I'm <strong>PFX AI</strong>.<br>
+                👋 Welcome! I'm
+                <strong>Peter</strong>.
 
-                Built by Peter. Ask me anything!
+                <br>
+
+                Ask me anything and let's get started.
 
             </div>
 
@@ -303,6 +361,8 @@ function saveChat() {
 // ==========================
 
 window.addEventListener("load", () => {
+    // Keep sidebar closed when Peter opens
+sidebar.classList.add("hide-sidebar");
 
     const savedChat =
         localStorage.getItem("pfxChat");
@@ -327,15 +387,15 @@ window.addEventListener("load", () => {
         );
 
 
-        themeBtn.textContent =
-            "☀️ Light";
+        themeBtn.innerHTML =
+            '<i class="fa-solid fa-sun"></i>';
 
     }
 
     else {
 
-        themeBtn.textContent =
-            "🌙 Dark";
+        themeBtn.innerHTML =
+            '<i class="fa-solid fa-moon"></i>';
 
     }
 
@@ -359,8 +419,8 @@ themeBtn.addEventListener("click", () => {
         )
     ) {
 
-        themeBtn.textContent =
-            "☀️ Light";
+        themeBtn.innerHTML =
+            '<i class="fa-solid fa-sun"></i>';
 
 
         localStorage.setItem(
@@ -372,8 +432,8 @@ themeBtn.addEventListener("click", () => {
 
     else {
 
-        themeBtn.textContent =
-            "🌙 Dark";
+        themeBtn.innerHTML =
+            '<i class="fa-solid fa-moon"></i>';
 
 
         localStorage.setItem(
@@ -387,58 +447,280 @@ themeBtn.addEventListener("click", () => {
 
 
 // ==========================
-// VOICE INPUT
+// VOICE SYSTEM
 // ==========================
 
 const SpeechRecognition =
     window.SpeechRecognition ||
     window.webkitSpeechRecognition;
 
-
-if (SpeechRecognition && voiceBtn) {
-
-    const recognition =
-        new SpeechRecognition();
+let recognition = null;
+let isListening = false;
+let isSpeaking = false;
 
 
-    recognition.lang =
-        "en-US";
+// ==========================
+// VOICE INPUT
+// ==========================
+
+if (SpeechRecognition) {
+
+    recognition = new SpeechRecognition();
+
+    recognition.lang = "en-US";
+    recognition.continuous = false;
+    recognition.interimResults = false;
 
 
-    recognition.onresult =
-        function (event) {
+    recognition.onstart = function () {
 
-            const speech =
-                event.results[0][0].transcript;
+        isListening = true;
+
+        console.log("🎤 Peter is listening...");
+
+        if (voiceBtn) {
+            voiceBtn.innerHTML =
+                '<i class="fa-solid fa-stop"></i>';
+        }
+
+    };
 
 
-            input.value =
-                speech;
+    recognition.onresult = function (event) {
 
+        console.log("🎤 Speech result received!");
+
+        const speech =
+            event.results[0][0].transcript.trim();
+
+        console.log("🗣️ You said:", speech);
+
+        if (!speech) return;
+
+        input.value = speech;
+
+        // Give the browser a moment
+        setTimeout(() => {
 
             sendMessage();
 
-        };
+        }, 300);
+
+    };
 
 
-    recognition.onerror =
-        function (event) {
+    recognition.onerror = function (event) {
 
-            console.log(
-                "Speech Error:",
-                event.error
-            );
+        console.error(
+            "🎤 Speech recognition error:",
+            event.error
+        );
 
-        };
+    };
 
+
+    recognition.onend = function () {
+
+        isListening = false;
+
+        console.log("🎤 Listening stopped.");
+
+        if (voiceBtn) {
+            voiceBtn.innerHTML =
+                '<i class="fa-solid fa-microphone"></i>';
+        }
+
+    };
+
+}
+
+
+// ==========================
+// START / STOP LISTENING
+// ==========================
+
+function startListening() {
+
+    if (!recognition) {
+
+        alert(
+            "Your browser does not support voice recognition."
+        );
+
+        return;
+
+    }
+
+    if (isListening) {
+
+        recognition.stop();
+
+        return;
+
+    }
+
+    // Stop Peter talking
+    stopSpeaking();
+
+    try {
+
+        recognition.start();
+
+    } catch (error) {
+
+        console.error(
+            "🎤 Microphone error:",
+            error
+        );
+
+    }
+
+}
+
+
+// ==========================
+// MAIN VOICE BUTTON
+// ==========================
+
+if (voiceBtn) {
 
     voiceBtn.addEventListener(
         "click",
-        () => {
-
-            recognition.start();
-
-        }
+        startListening
     );
 
 }
+
+
+// ==========================
+// SIDEBAR VOICE BUTTON
+// ==========================
+
+if (voiceSidebarBtn) {
+
+    voiceSidebarBtn.addEventListener(
+        "click",
+        startListening
+    );
+
+}
+
+
+// ==========================
+// PETER SPEAKS
+// ==========================
+
+function speakReply(text) {
+
+    if (!("speechSynthesis" in window)) {
+
+        console.log(
+            "🔊 Speech synthesis is not supported."
+        );
+
+        return;
+
+    }
+
+    window.speechSynthesis.cancel();
+
+    const cleanText = text
+        .replace(/[*_#`]/g, "")
+        .trim();
+
+    if (!cleanText) return;
+
+    const utterance =
+        new SpeechSynthesisUtterance(
+            cleanText
+        );
+
+    utterance.lang = "en-US";
+    utterance.rate = 0.95;
+    utterance.pitch = 1;
+    utterance.volume = 1;
+
+
+    utterance.onstart = function () {
+
+        isSpeaking = true;
+
+        console.log(
+            "🔊 Peter is speaking..."
+        );
+
+    };
+
+
+    utterance.onend = function () {
+
+        isSpeaking = false;
+
+        console.log(
+            "🔊 Peter finished speaking."
+        );
+
+    };
+
+
+    utterance.onerror = function (event) {
+
+        isSpeaking = false;
+
+        console.error(
+            "🔊 Speech error:",
+            event.error
+        );
+
+    };
+
+
+    window.speechSynthesis.speak(
+        utterance
+    );
+
+}
+
+
+// ==========================
+// STOP SPEAKING
+// ==========================
+
+function stopSpeaking() {
+
+    if ("speechSynthesis" in window) {
+
+        window.speechSynthesis.cancel();
+
+        isSpeaking = false;
+
+    }
+
+}
+
+
+// ==========================
+// ESCAPE KEY
+// ==========================
+
+document.addEventListener(
+    "keydown",
+    function (event) {
+
+        if (event.key === "Escape") {
+
+            stopSpeaking();
+
+            if (
+                recognition &&
+                isListening
+            ) {
+
+                recognition.stop();
+
+            }
+
+        }
+
+    }
+);
