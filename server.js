@@ -2,10 +2,11 @@ require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 
 const app = express();
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 
 // ==========================
@@ -15,6 +16,16 @@ const PORT = 3000;
 app.use(cors());
 
 app.use(express.json());
+
+
+// ==========================
+// SERVE FRONTEND
+// ==========================
+
+app.use(express.static(path.join(__dirname)));
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "index.html"));
+});
 
 
 // ==========================
@@ -48,14 +59,9 @@ app.post("/chat", async (req, res) => {
 
     }
 
-
     try {
 
-        console.log(
-            "📩 User:",
-            message
-        );
-
+        console.log("📩 User:", message);
 
         // ==========================
         // OPENROUTER REQUEST
@@ -76,7 +82,7 @@ app.post("/chat", async (req, res) => {
                         "application/json",
 
                     "HTTP-Referer":
-                        "http://localhost:3000",
+                        process.env.APP_URL || "http://localhost:3000",
 
                     "X-Title":
                         "PFX AI"
@@ -119,7 +125,6 @@ app.post("/chat", async (req, res) => {
         const data =
             await response.json();
 
-
         console.log(
             "🤖 OpenRouter status:",
             response.status
@@ -145,6 +150,7 @@ app.post("/chat", async (req, res) => {
                         "⚠️ OpenRouter returned an error. Check the server terminal."
 
                 });
+
         }
 
 
@@ -169,11 +175,12 @@ app.post("/chat", async (req, res) => {
                     "⚠️ PFX AI received an invalid response from the AI provider."
 
             });
+
         }
 
 
         // ==========================
-        // SEND RESPONSE TO FRONTEND
+        // SEND RESPONSE
         // ==========================
 
         console.log(
@@ -182,9 +189,7 @@ app.post("/chat", async (req, res) => {
         );
 
         res.json({
-
             reply: reply
-
         });
 
     }

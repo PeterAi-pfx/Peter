@@ -16,15 +16,19 @@ const voiceBtn = document.getElementById("voice-btn");
 sendBtn.addEventListener("click", sendMessage);
 
 input.addEventListener("keypress", function (e) {
+
     if (e.key === "Enter") {
         sendMessage();
     }
+
 });
 
 input.addEventListener("keydown", function (e) {
+
     if (e.key === "Escape") {
         input.value = "";
     }
+
 });
 
 
@@ -48,7 +52,9 @@ async function sendMessage() {
 
         addMessage(reply, "ai");
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
         console.error("AI Error:", error);
 
@@ -60,6 +66,7 @@ async function sendMessage() {
         );
 
     }
+
 }
 
 
@@ -69,7 +76,7 @@ async function sendMessage() {
 
 async function getAIReply(message) {
 
-    const response = await fetch("http://localhost:3000/chat", {
+    const response = await fetch("/chat", {
 
         method: "POST",
 
@@ -83,6 +90,7 @@ async function getAIReply(message) {
 
     });
 
+
     if (!response.ok) {
 
         throw new Error(
@@ -91,15 +99,21 @@ async function getAIReply(message) {
 
     }
 
+
     const data = await response.json();
+
 
     if (!data.reply) {
 
-        throw new Error("No reply received from server.");
+        throw new Error(
+            "No reply received from server."
+        );
 
     }
 
+
     return data.reply;
+
 }
 
 
@@ -112,25 +126,41 @@ function addMessage(message, sender) {
     const now = new Date();
 
     const time = now.toLocaleTimeString([], {
+
         hour: "2-digit",
         minute: "2-digit"
+
     });
 
-    const messageDiv = document.createElement("div");
 
-    messageDiv.className = `message ${sender}`;
+    const messageDiv =
+        document.createElement("div");
 
-    const bubble = document.createElement("div");
+    messageDiv.className =
+        `message ${sender}`;
 
-    bubble.className = "bubble";
 
-    bubble.textContent = message;
+    const bubble =
+        document.createElement("div");
 
-    const timeDiv = document.createElement("div");
+    bubble.className =
+        "bubble";
 
-    timeDiv.className = "time";
 
-    timeDiv.textContent = time;
+    bubble.textContent =
+        message;
+
+
+    const timeDiv =
+        document.createElement("div");
+
+    timeDiv.className =
+        "time";
+
+
+    timeDiv.textContent =
+        time;
+
 
     bubble.appendChild(timeDiv);
 
@@ -138,9 +168,12 @@ function addMessage(message, sender) {
 
     chatBox.appendChild(messageDiv);
 
-    chatBox.scrollTop = chatBox.scrollHeight;
+    chatBox.scrollTop =
+        chatBox.scrollHeight;
+
 
     saveChat();
+
 }
 
 
@@ -150,29 +183,42 @@ function addMessage(message, sender) {
 
 function showTyping() {
 
-    const typing = document.createElement("div");
+    const typing =
+        document.createElement("div");
 
-    typing.className = "message ai";
+    typing.className =
+        "message ai";
 
-    typing.id = "typing";
+    typing.id =
+        "typing";
+
 
     typing.innerHTML = `
+
         <div class="bubble">
+
             <span class="dot"></span>
             <span class="dot"></span>
             <span class="dot"></span>
+
         </div>
+
     `;
+
 
     chatBox.appendChild(typing);
 
-    chatBox.scrollTop = chatBox.scrollHeight;
+    chatBox.scrollTop =
+        chatBox.scrollHeight;
+
 }
 
 
 function removeTyping() {
 
-    const typing = document.getElementById("typing");
+    const typing =
+        document.getElementById("typing");
+
 
     if (typing) {
         typing.remove();
@@ -189,14 +235,23 @@ newChatBtn.addEventListener("click", () => {
 
     localStorage.removeItem("pfxChat");
 
+
     chatBox.innerHTML = `
+
         <div class="message ai">
+
             <div class="bubble">
+
                 👋 Welcome back! I'm <strong>PFX AI</strong>.<br>
+
                 Built by Peter. Ask me anything!
+
             </div>
+
         </div>
+
     `;
+
 
     saveChat();
 
@@ -209,7 +264,9 @@ newChatBtn.addEventListener("click", () => {
 
 historyBtn.addEventListener("click", () => {
 
-    alert("🚧 Chat History is coming soon!");
+    alert(
+        "🚧 Chat History is coming soon!"
+    );
 
 });
 
@@ -220,7 +277,9 @@ historyBtn.addEventListener("click", () => {
 
 menuBtn.addEventListener("click", () => {
 
-    sidebar.classList.toggle("hide-sidebar");
+    sidebar.classList.toggle(
+        "hide-sidebar"
+    );
 
 });
 
@@ -245,23 +304,38 @@ function saveChat() {
 
 window.addEventListener("load", () => {
 
-    const savedChat = localStorage.getItem("pfxChat");
+    const savedChat =
+        localStorage.getItem("pfxChat");
+
 
     if (savedChat) {
-        chatBox.innerHTML = savedChat;
+
+        chatBox.innerHTML =
+            savedChat;
+
     }
 
-    const savedTheme = localStorage.getItem("theme");
+
+    const savedTheme =
+        localStorage.getItem("theme");
+
 
     if (savedTheme === "light") {
 
-        document.body.classList.add("light-mode");
+        document.body.classList.add(
+            "light-mode"
+        );
 
-        themeBtn.textContent = "☀️ Light";
 
-    } else {
+        themeBtn.textContent =
+            "☀️ Light";
 
-        themeBtn.textContent = "🌙 Dark";
+    }
+
+    else {
+
+        themeBtn.textContent =
+            "🌙 Dark";
 
     }
 
@@ -274,19 +348,38 @@ window.addEventListener("load", () => {
 
 themeBtn.addEventListener("click", () => {
 
-    document.body.classList.toggle("light-mode");
+    document.body.classList.toggle(
+        "light-mode"
+    );
 
-    if (document.body.classList.contains("light-mode")) {
 
-        themeBtn.textContent = "☀️ Light";
+    if (
+        document.body.classList.contains(
+            "light-mode"
+        )
+    ) {
 
-        localStorage.setItem("theme", "light");
+        themeBtn.textContent =
+            "☀️ Light";
 
-    } else {
 
-        themeBtn.textContent = "🌙 Dark";
+        localStorage.setItem(
+            "theme",
+            "light"
+        );
 
-        localStorage.setItem("theme", "dark");
+    }
+
+    else {
+
+        themeBtn.textContent =
+            "🌙 Dark";
+
+
+        localStorage.setItem(
+            "theme",
+            "dark"
+        );
 
     }
 
@@ -301,36 +394,51 @@ const SpeechRecognition =
     window.SpeechRecognition ||
     window.webkitSpeechRecognition;
 
+
 if (SpeechRecognition && voiceBtn) {
 
-    const recognition = new SpeechRecognition();
+    const recognition =
+        new SpeechRecognition();
 
-    recognition.lang = "en-US";
 
-    recognition.onresult = function (event) {
+    recognition.lang =
+        "en-US";
 
-        const speech =
-            event.results[0][0].transcript;
 
-        input.value = speech;
+    recognition.onresult =
+        function (event) {
 
-        sendMessage();
+            const speech =
+                event.results[0][0].transcript;
 
-    };
 
-    recognition.onerror = function (event) {
+            input.value =
+                speech;
 
-        console.log(
-            "Speech Error:",
-            event.error
-        );
 
-    };
+            sendMessage();
 
-    voiceBtn.addEventListener("click", () => {
+        };
 
-        recognition.start();
 
-    });
+    recognition.onerror =
+        function (event) {
+
+            console.log(
+                "Speech Error:",
+                event.error
+            );
+
+        };
+
+
+    voiceBtn.addEventListener(
+        "click",
+        () => {
+
+            recognition.start();
+
+        }
+    );
 
 }
