@@ -262,59 +262,53 @@ function removeTyping() {
 // NEW CHAT
 // ==========================
 
-newChatBtn.addEventListener("click", () => {
+if (newChatBtn) {
 
-    // Stop voice
-    stopSpeaking();
+    newChatBtn.addEventListener("click", function () {
 
-    // Stop listening
-    stopListening();
+        console.log("🆕 New Chat clicked");
 
+        // Stop Peter speaking
+        stopSpeaking();
+ 
+        // Clear saved conversation
+        localStorage.removeItem("pfxChat");
 
-    localStorage.removeItem("pfxChat");
+        // Clear chat
+        chatBox.innerHTML = "";
 
+        // Add fresh welcome message
+        const welcomeMessage =
+            document.createElement("div");
 
-    chatBox.innerHTML = `
+        welcomeMessage.className =
+            "message ai";
 
-        <div class="welcome">
-
-            <div class="welcome-icon">
-                P
-            </div>
-
-            <h1>
-                How can I help you today?
-            </h1>
-
-            <p>
-                I'm Peter, your personal AI assistant.
-            </p>
-
-        </div>
-
-
-        <div class="message ai">
-
+        welcomeMessage.innerHTML = `
             <div class="bubble">
-
-                👋 Welcome! I'm
-                <strong>Peter</strong>.
-
-                <br>
-
-                Ask me anything and let's get started.
-
+                👋 Welcome! I'm <strong>Peter</strong>.<br>
+                Ask me anything!
             </div>
+        `;
 
-        </div>
+        chatBox.appendChild(welcomeMessage);
 
-    `;
+        // Save the fresh chat
+        saveChat();
 
+        // Close sidebar after creating new chat
+        if (sidebar) {
+            sidebar.classList.add("hide-sidebar");
+        }
 
-    saveChat();
+        // Put cursor back in input
+        if (input) {
+            input.focus();
+        }
 
-});
+    });
 
+}
 
 // ==========================
 // HISTORY
@@ -584,10 +578,19 @@ function startListening() {
 
 if (voiceBtn) {
 
-    voiceBtn.addEventListener(
-        "click",
-        startListening
-    );
+    voiceBtn.addEventListener("click", function () {
+
+        if (isSpeaking) {
+
+            stopSpeaking();
+
+        } else {
+
+            startListening();
+
+        }
+
+    });
 
 }
 
@@ -681,9 +684,8 @@ function speakReply(text) {
 
 }
 
-
 // ==========================
-// STOP SPEAKING
+// STOP PETER SPEAKING
 // ==========================
 
 function stopSpeaking() {
@@ -693,6 +695,8 @@ function stopSpeaking() {
         window.speechSynthesis.cancel();
 
         isSpeaking = false;
+
+        console.log("🔇 Peter stopped speaking.");
 
     }
 
