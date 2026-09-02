@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
 
     <meta
@@ -12,93 +10,100 @@
 
     <title>Peter AI</title>
 
-    <!-- Font Awesome -->
     <link
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
     >
 
-    <!-- Google Font -->
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
         rel="stylesheet"
+        href="style.css"
     >
-
-    <link rel="stylesheet" href="style.css">
-
 </head>
-
 
 <body>
 
-<div class="container">
+<div class="app">
 
-
-    <!-- ==========================
+    <!-- =====================================
          SIDEBAR
-    =========================== -->
+    ====================================== -->
 
     <aside class="sidebar" id="sidebar">
 
         <div class="sidebar-top">
 
+            <!-- BRAND -->
+
             <div class="brand">
 
-                <div class="brand-icon">
-                    P
+                <div class="peter-logo">
+
+                    <div class="logo-orb">
+
+                        <div class="logo-color purple"></div>
+                        <div class="logo-color cyan"></div>
+                        <div class="logo-color pink"></div>
+                        <div class="logo-color green"></div>
+                        <div class="logo-color blue"></div>
+
+                        <span class="logo-letter">P</span>
+
+                    </div>
+
                 </div>
 
-                <span>Peter</span>
+                <div class="brand-name">
+                    Peter <span>AI</span>
+                </div>
 
             </div>
 
 
+            <!-- NEW CHAT -->
+
             <button
+                class="new-chat-btn"
                 id="new-chat-btn"
-                class="new-chat"
             >
 
                 <i class="fa-solid fa-plus"></i>
 
-                <span>New chat</span>
+                <span>
+                    New chat
+                </span>
 
             </button>
 
 
+            <!-- NAVIGATION -->
+
             <nav class="sidebar-nav">
 
-                <button id="history-btn">
+                <button
+                    class="sidebar-item active"
+                    id="home-btn"
+                >
+
+                    <i class="fa-solid fa-house"></i>
+
+                    <span>
+                        Home
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="sidebar-item"
+                    id="history-btn"
+                >
 
                     <i class="fa-solid fa-clock-rotate-left"></i>
 
-                    <span>History</span>
-
-                </button>
-
-
-                <button id="files-btn">
-
-                    <i class="fa-solid fa-folder"></i>
-
-                    <span>Files</span>
-
-                </button>
-
-
-                <button id="voice-sidebar-btn">
-
-                    <i class="fa-solid fa-microphone"></i>
-
-                    <span>Voice</span>
-
-                </button>
-
-
-                <button id="settings-btn">
-
-                    <i class="fa-solid fa-gear"></i>
-
-                    <span>Settings</span>
+                    <span>
+                        History
+                    </span>
 
                 </button>
 
@@ -107,46 +112,73 @@
         </div>
 
 
-        <!-- PROFILE -->
+        <!-- SIDEBAR BOTTOM -->
 
-        <div class="profile">
+        <div class="sidebar-bottom">
 
-            <div class="avatar">
-                P
+            <button
+                class="sidebar-item"
+                id="theme-btn"
+            >
+
+                <i class="fa-solid fa-moon"></i>
+
+                <span>
+                    Dark mode
+                </span>
+
+            </button>
+
+
+            <div class="sidebar-user">
+
+                <div class="user-avatar">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+
+                <div class="user-info">
+
+                    <strong>
+                        You
+                    </strong>
+
+                    <span>
+                        Peter AI
+                    </span>
+
+                </div>
+
             </div>
-
-            <div class="profile-info">
-
-                <strong>Peter</strong>
-
-                <span>AI Assistant</span>
-
-            </div>
-
-            <i class="fa-solid fa-ellipsis"></i>
 
         </div>
 
     </aside>
 
 
+    <!-- MOBILE OVERLAY -->
 
-    <!-- ==========================
-         MAIN APP
-    =========================== -->
+    <div
+        class="sidebar-overlay"
+        id="sidebar-overlay"
+    ></div>
 
-    <section class="app">
 
+    <!-- =====================================
+         MAIN
+    ====================================== -->
 
-        <!-- HEADER -->
+    <main class="main" id="main">
 
-        <header>
+        <!-- TOPBAR -->
 
-            <div class="header-left">
+        <header class="topbar">
+
+            <div class="topbar-left">
 
                 <button
+                    class="menu-btn"
                     id="menu-btn"
-                    class="icon-btn"
+                    title="Menu"
                 >
 
                     <i class="fa-solid fa-bars"></i>
@@ -154,96 +186,208 @@
                 </button>
 
 
-                <div class="model-info">
+                <div class="topbar-logo">
 
-                    <div class="model-name">
+                    <div class="logo-orb mini-logo">
 
-                        Peter
+                        <div class="logo-color purple"></div>
+                        <div class="logo-color cyan"></div>
+                        <div class="logo-color pink"></div>
+                        <div class="logo-color green"></div>
 
-                        <i class="fa-solid fa-chevron-down"></i>
-
-                    </div>
-
-                    <div class="status">
-
-                        <span class="status-dot"></span>
-
-                        Online
+                        <span class="logo-letter">
+                            P
+                        </span>
 
                     </div>
 
                 </div>
 
+
+                <div class="topbar-title">
+                    Peter
+                </div>
+
             </div>
 
 
-            <button
-                id="theme-btn"
-                class="theme-btn"
-            >
+            <div class="topbar-right">
 
-                <i class="fa-solid fa-moon"></i>
+                <button
+                    class="topbar-btn"
+                    id="clear-btn"
+                    title="Clear chat"
+                >
 
-            </button>
+                    <i class="fa-solid fa-trash"></i>
+
+                </button>
+
+            </div>
 
         </header>
 
 
+        <!-- =====================================
+             CHAT AREA
+        ====================================== -->
 
-        <!-- ==========================
-             CHAT
-        =========================== -->
+        <section
+            class="chat-area"
+            id="chat-area"
+        >
 
-        <main id="chat-box">
+            <!-- WELCOME -->
 
-            <div class="welcome">
+            <div
+                class="welcome"
+                id="welcome"
+            >
 
-                <div class="welcome-icon">
-                    P
+                <div class="welcome-logo">
+
+                    <div class="logo-orb big-logo">
+
+                        <div class="logo-color purple"></div>
+                        <div class="logo-color cyan"></div>
+                        <div class="logo-color pink"></div>
+                        <div class="logo-color green"></div>
+                        <div class="logo-color blue"></div>
+
+                        <span class="logo-letter">
+                            P
+                        </span>
+
+                    </div>
+
                 </div>
+
 
                 <h1>
-                    How can I help you today?
+                    Hey, I'm Peter
                 </h1>
 
+
                 <p>
-                    I'm Peter, your personal AI assistant.
+                    Your AI assistant. Ask me anything.
                 </p>
 
-            </div>
+
+                <!-- SUGGESTIONS -->
+
+                <div class="suggestions">
+
+                    <button
+                        class="suggestion"
+                        data-prompt="Explain something interesting to me."
+                    >
+
+                        <i class="fa-solid fa-lightbulb"></i>
+
+                        <span>
+                            Teach me something
+                        </span>
+
+                    </button>
 
 
-            <div class="message ai">
+                    <button
+                        class="suggestion"
+                        data-prompt="Help me write something professional."
+                    >
 
-                <div class="bubble">
+                        <i class="fa-solid fa-pen"></i>
 
-                    👋 Welcome! I'm
-                    <strong>Peter</strong>.
+                        <span>
+                            Help me write
+                        </span>
 
-                    <br>
+                    </button>
 
-                    Ask me anything and let's get started.
+
+                    <button
+                        class="suggestion"
+                        data-prompt="Give me some creative ideas."
+                    >
+
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+
+                        <span>
+                            Creative ideas
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        class="suggestion"
+                        data-prompt="Help me solve a difficult problem."
+                    >
+
+                        <i class="fa-solid fa-brain"></i>
+
+                        <span>
+                            Solve a problem
+                        </span>
+
+                    </button>
 
                 </div>
 
             </div>
 
-        </main>
+
+            <!-- MESSAGES -->
+
+            <div
+                class="messages"
+                id="messages"
+            ></div>
+
+        </section>
 
 
+        <!-- =====================================
+             COMPOSER
+        ====================================== -->
 
-        <!-- ==========================
-             INPUT
-        =========================== -->
-
-        <footer>
+        <div
+            class="composer-wrapper"
+            id="composer-wrapper"
+        >
 
             <div class="composer">
 
+                <input
+                    type="file"
+                    id="file-input"
+                    hidden
+                    accept=".pdf,.docx,.txt,.csv,.xls,.xlsx"
+                >
+
+
                 <button
-                    id="voice-btn"
                     class="composer-btn"
-                    title="Voice input"
+                    id="attach-btn"
+                    title="Attach file"
+                >
+
+                    <i class="fa-solid fa-paperclip"></i>
+
+                </button>
+
+
+                <textarea
+                    id="message-input"
+                    rows="1"
+                    placeholder="Message Peter..."
+                ></textarea>
+
+
+                <button
+                    class="composer-btn voice-btn"
+                    id="voice-btn"
+                    title="Voice"
                 >
 
                     <i class="fa-solid fa-microphone"></i>
@@ -251,18 +395,10 @@
                 </button>
 
 
-                <input
-                    type="text"
-                    id="user-input"
-                    placeholder="Message Peter..."
-                    autocomplete="off"
-                >
-
-
                 <button
-                    id="send-btn"
                     class="send-btn"
-                    title="Send message"
+                    id="send-btn"
+                    title="Send"
                 >
 
                     <i class="fa-solid fa-arrow-up"></i>
@@ -272,16 +408,115 @@
             </div>
 
 
-            <p class="footer-note">
+            <div
+                class="file-preview"
+                id="file-preview"
+            ></div>
 
+
+            <div class="composer-note">
                 Peter can make mistakes. Check important information.
+            </div>
 
-            </p>
-
-        </footer>
+        </div>
 
 
-    </section>
+        <!-- =====================================
+             SIRI VOICE MODE
+        ====================================== -->
+
+        <div
+            class="voice-mode"
+            id="voice-mode"
+        >
+
+            <div class="voice-background-glow"></div>
+
+
+            <div class="voice-panel">
+
+                <div class="siri-orb">
+
+                    <div class="siri-ring ring-1"></div>
+                    <div class="siri-ring ring-2"></div>
+                    <div class="siri-ring ring-3"></div>
+
+                    <div class="siri-glow"></div>
+
+
+                    <div class="siri-core">
+
+                        <div class="siri-color color-1"></div>
+                        <div class="siri-color color-2"></div>
+                        <div class="siri-color color-3"></div>
+                        <div class="siri-color color-4"></div>
+
+                        <i class="fa-solid fa-microphone"></i>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="sound-waves"
+                    id="sound-waves"
+                >
+
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+
+                </div>
+
+
+                <div class="voice-status">
+
+                    <div
+                        class="voice-status-title"
+                        id="voice-status-title"
+                    >
+                        Listening
+                    </div>
+
+
+                    <div
+                        class="voice-status-text"
+                        id="voice-status-text"
+                    >
+                        Speak to Peter...
+                    </div>
+
+                </div>
+
+
+                <button
+                    class="stop-voice-btn"
+                    id="stop-voice-btn"
+                >
+
+                    <i class="fa-solid fa-xmark"></i>
+
+                    <span>
+                        End voice
+                    </span>
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </main>
 
 </div>
 
@@ -289,5 +524,4 @@
 <script src="script.js"></script>
 
 </body>
-
 </html>

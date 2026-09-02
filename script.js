@@ -1,570 +1,1403 @@
-// ==========================
-// ELEMENTS
-// ==========================
+/* =========================================
+   PETER AI
+========================================= */
 
-const chatBox = document.getElementById("chat-box");
-const input = document.getElementById("user-input");
-const sendBtn = document.getElementById("send-btn");
-const newChatBtn = document.getElementById("new-chat-btn");
-const historyBtn = document.getElementById("history-btn");
-const menuBtn = document.getElementById("menu-btn");
-const sidebar = document.querySelector(".sidebar");
-const themeBtn = document.getElementById("theme-btn");
-const voiceBtn = document.getElementById("voice-btn");
-const voiceSidebarBtn = document.getElementById("voice-sidebar-btn");
 
+/* =========================================
+   ELEMENTS
+========================================= */
 
-// ==========================
-// SEND MESSAGE
-// ==========================
-
-sendBtn.addEventListener("click", sendMessage);
-
-
-input.addEventListener("keypress", function (e) {
-
-    if (e.key === "Enter") {
-        e.preventDefault();
-        sendMessage();
-    }
-
-});
-
-
-input.addEventListener("keydown", function (e) {
-
-    if (e.key === "Escape") {
-        input.value = "";
-    }
-
-});
-
-
-// ==========================
-// SEND MESSAGE FUNCTION
-// ==========================
-
-async function sendMessage() {
-
-    const text = input.value.trim();
-
-    if (text === "") return;
-
-    // Stop Peter speaking if a new message is sent
-    stopSpeaking();
-
-    addMessage(text, "user");
-
-    input.value = "";
-
-    showTyping();
-
-    try {
-
-        const reply = await getAIReply(text);
-
-        removeTyping();
-
-        addMessage(reply, "ai");
-
-        // Peter speaks the response
-        speakReply(reply);
-
-    }
-
-    catch (error) {
-
-        console.error("AI Error:", error);
-
-        removeTyping();
-
-        const errorMessage =
-            "⚠️ Sorry, I couldn't connect to Peter AI.";
-
-        addMessage(errorMessage, "ai");
-
-    }
-
-}
-
-
-// ==========================
-// TALK TO BACKEND
-// ==========================
-
-async function getAIReply(message) {
-
-    const response = await fetch("/chat", {
-
-        method: "POST",
-
-        headers: {
-            "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({
-            message: message
-        })
-
-    });
-
-
-    if (!response.ok) {
-
-        throw new Error(
-            `Server returned ${response.status}`
-        );
-
-    }
-
-
-    const data = await response.json();
-
-
-    if (!data.reply) {
-
-        throw new Error(
-            "No reply received from server."
-        );
-
-    }
-
-
-    return data.reply;
-
-}
-
-
-// ==========================
-// ADD MESSAGE
-// ==========================
-
-function addMessage(message, sender) {
-
-    const now = new Date();
-
-
-    const time = now.toLocaleTimeString([], {
-
-        hour: "2-digit",
-
-        minute: "2-digit"
-
-    });
-
-
-    const messageDiv =
-        document.createElement("div");
-
-
-    messageDiv.className =
-        `message ${sender}`;
-
-
-    const bubble =
-        document.createElement("div");
-
-
-    bubble.className =
-        "bubble";
-
-
-    bubble.textContent =
-        message;
-
-
-    const timeDiv =
-        document.createElement("div");
-
-
-    timeDiv.className =
-        "time";
-
-
-    timeDiv.textContent =
-        time;
-
-
-    bubble.appendChild(timeDiv);
-
-
-    messageDiv.appendChild(bubble);
-
-
-    chatBox.appendChild(messageDiv);
-
-
-    chatBox.scrollTop =
-        chatBox.scrollHeight;
-
-
-    saveChat();
-
-}
-
-
-// ==========================
-// TYPING ANIMATION
-// ==========================
-
-function showTyping() {
-
-    const typing =
-        document.createElement("div");
-
-
-    typing.className =
-        "message ai";
-
-
-    typing.id =
-        "typing";
-
-
-    typing.innerHTML = `
-
-        <div class="bubble">
-
-            <span class="dot"></span>
-            <span class="dot"></span>
-            <span class="dot"></span>
-
-        </div>
-
-    `;
-
-
-    chatBox.appendChild(typing);
-
-
-    chatBox.scrollTop =
-        chatBox.scrollHeight;
-
-}
-
-
-function removeTyping() {
-
-    const typing =
-        document.getElementById("typing");
-
-
-    if (typing) {
-
-        typing.remove();
-
-    }
-
-}
-
-
-// ==========================
-// NEW CHAT
-// ==========================
-
-if (newChatBtn) {
-
-    newChatBtn.addEventListener("click", function () {
-
-        console.log("🆕 New Chat clicked");
-
-        // Stop Peter speaking
-        stopSpeaking();
- 
-        // Clear saved conversation
-        localStorage.removeItem("pfxChat");
-
-        // Clear chat
-        chatBox.innerHTML = "";
-
-        // Add fresh welcome message
-        const welcomeMessage =
-            document.createElement("div");
-
-        welcomeMessage.className =
-            "message ai";
-
-        welcomeMessage.innerHTML = `
-            <div class="bubble">
-                👋 Welcome! I'm <strong>Peter</strong>.<br>
-                Ask me anything!
-            </div>
-        `;
-
-        chatBox.appendChild(welcomeMessage);
-
-        // Save the fresh chat
-        saveChat();
-
-        // Close sidebar after creating new chat
-        if (sidebar) {
-            sidebar.classList.add("hide-sidebar");
-        }
-
-        // Put cursor back in input
-        if (input) {
-            input.focus();
-        }
-
-    });
-
-}
-
-// ==========================
-// HISTORY
-// ==========================
-
-historyBtn.addEventListener("click", () => {
-
-    alert(
-        "🚧 Chat History is coming soon!"
+const input =
+    document.getElementById(
+        "message-input"
     );
 
-});
-
-
-// ==========================
-// SIDEBAR
-// ==========================
-
-menuBtn.addEventListener("click", () => {
-
-    sidebar.classList.toggle(
-        "hide-sidebar"
+const sendBtn =
+    document.getElementById(
+        "send-btn"
     );
 
-});
-
-
-// ==========================
-// SAVE CHAT
-// ==========================
-
-function saveChat() {
-
-    localStorage.setItem(
-        "pfxChat",
-        chatBox.innerHTML
+const messages =
+    document.getElementById(
+        "messages"
     );
 
-}
-
-
-// ==========================
-// LOAD SAVED DATA
-// ==========================
-
-window.addEventListener("load", () => {
-    // Keep sidebar closed when Peter opens
-sidebar.classList.add("hide-sidebar");
-
-    const savedChat =
-        localStorage.getItem("pfxChat");
-
-
-    if (savedChat) {
-
-        chatBox.innerHTML =
-            savedChat;
-
-    }
-
-
-    const savedTheme =
-        localStorage.getItem("theme");
-
-
-    if (savedTheme === "light") {
-
-        document.body.classList.add(
-            "light-mode"
-        );
-
-
-        themeBtn.innerHTML =
-            '<i class="fa-solid fa-sun"></i>';
-
-    }
-
-    else {
-
-        themeBtn.innerHTML =
-            '<i class="fa-solid fa-moon"></i>';
-
-    }
-
-});
-
-
-// ==========================
-// THEME
-// ==========================
-
-themeBtn.addEventListener("click", () => {
-
-    document.body.classList.toggle(
-        "light-mode"
+const welcome =
+    document.getElementById(
+        "welcome"
     );
 
+const menuBtn =
+    document.getElementById(
+        "menu-btn"
+    );
+
+const sidebar =
+    document.getElementById(
+        "sidebar"
+    );
+
+const sidebarOverlay =
+    document.getElementById(
+        "sidebar-overlay"
+    );
+
+const newChatBtn =
+    document.getElementById(
+        "new-chat-btn"
+    );
+
+const clearBtn =
+    document.getElementById(
+        "clear-btn"
+    );
+
+const themeBtn =
+    document.getElementById(
+        "theme-btn"
+    );
+
+const attachBtn =
+    document.getElementById(
+        "attach-btn"
+    );
+
+const fileInput =
+    document.getElementById(
+        "file-input"
+    );
+
+const filePreview =
+    document.getElementById(
+        "file-preview"
+    );
+
+const voiceBtn =
+    document.getElementById(
+        "voice-btn"
+    );
+
+const composer =
+    document.querySelector(
+        ".composer"
+    );
+
+const composerWrapper =
+    document.getElementById(
+        "composer-wrapper"
+    );
+
+const voiceMode =
+    document.getElementById(
+        "voice-mode"
+    );
+
+const voiceStatusTitle =
+    document.getElementById(
+        "voice-status-title"
+    );
+
+const voiceStatusText =
+    document.getElementById(
+        "voice-status-text"
+    );
+
+const stopVoiceBtn =
+    document.getElementById(
+        "stop-voice-btn"
+    );
+
+
+/* =========================================
+   STATE
+========================================= */
+
+let selectedFile = null;
+
+let isSending = false;
+
+let recognition = null;
+
+let isListening = false;
+
+let isSpeaking = false;
+
+
+/* =========================================
+   INITIALIZE
+========================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        loadChat();
+
+        loadTheme();
+
+        setupSuggestions();
+
+        setupTextarea();
+
+        setupVoice();
+
+    }
+);
+
+
+/* =========================================
+   SIDEBAR
+========================================= */
+
+menuBtn.addEventListener(
+    "click",
+    event => {
+
+        event.stopPropagation();
+
+        toggleSidebar();
+
+    }
+);
+
+
+sidebarOverlay.addEventListener(
+    "click",
+    closeSidebar
+);
+
+
+function toggleSidebar() {
 
     if (
-        document.body.classList.contains(
-            "light-mode"
-        )
+        window.innerWidth <= 800
     ) {
 
-        themeBtn.innerHTML =
-            '<i class="fa-solid fa-sun"></i>';
+        sidebar.classList.toggle(
+            "open"
+        );
+
+        sidebarOverlay.classList.toggle(
+            "active"
+        );
+
+    }
+    else {
+
+        sidebar.classList.toggle(
+            "desktop-hidden"
+        );
+
+        if (
+            sidebar.classList.contains(
+                "desktop-hidden"
+            )
+        ) {
+
+            sidebar.style.display =
+                "none";
+
+        }
+        else {
+
+            sidebar.style.display =
+                "";
+
+        }
+
+    }
+
+}
 
 
-        localStorage.setItem(
-            "theme",
+function closeSidebar() {
+
+    sidebar.classList.remove(
+        "open"
+    );
+
+    sidebarOverlay.classList.remove(
+        "active"
+    );
+
+}
+
+
+/* =========================================
+   NEW CHAT
+========================================= */
+
+newChatBtn.addEventListener(
+    "click",
+    newChat
+);
+
+
+clearBtn.addEventListener(
+    "click",
+    newChat
+);
+
+
+function newChat() {
+
+    if (isSending) return;
+
+
+    messages.innerHTML =
+        "";
+
+
+    welcome.style.display =
+        "flex";
+
+
+    selectedFile =
+        null;
+
+
+    fileInput.value =
+        "";
+
+
+    updateFilePreview();
+
+
+    localStorage.removeItem(
+        "peter-chat"
+    );
+
+
+    input.value =
+        "";
+
+
+    input.style.height =
+        "auto";
+
+
+    input.focus();
+
+
+    closeSidebar();
+
+}
+
+
+/* =========================================
+   HOME
+========================================= */
+
+document
+    .getElementById("home-btn")
+    .addEventListener(
+        "click",
+        () => {
+
+            newChat();
+
+        }
+    );
+
+
+/* =========================================
+   HISTORY
+========================================= */
+
+document
+    .getElementById("history-btn")
+    .addEventListener(
+        "click",
+        () => {
+
+            const saved =
+                localStorage.getItem(
+                    "peter-chat"
+                );
+
+
+            if (!saved) {
+
+                alert(
+                    "No previous chat history yet."
+                );
+
+                return;
+
+            }
+
+
+            welcome.style.display =
+                "none";
+
+
+            messages.innerHTML =
+                saved;
+
+
+            closeSidebar();
+
+            scrollToBottom();
+
+        }
+    );
+
+
+/* =========================================
+   THEME
+========================================= */
+
+themeBtn.addEventListener(
+    "click",
+    toggleTheme
+);
+
+
+function toggleTheme() {
+
+    document.body.classList.toggle(
+        "light"
+    );
+
+
+    const light =
+        document.body.classList.contains(
+            "light"
+        );
+
+
+    localStorage.setItem(
+        "peter-theme",
+        light
+            ? "light"
+            : "dark"
+    );
+
+
+    updateThemeButton();
+
+}
+
+
+function loadTheme() {
+
+    if (
+        localStorage.getItem(
+            "peter-theme"
+        ) === "light"
+    ) {
+
+        document.body.classList.add(
             "light"
         );
 
     }
 
-    else {
 
-        themeBtn.innerHTML =
-            '<i class="fa-solid fa-moon"></i>';
-
-
-        localStorage.setItem(
-            "theme",
-            "dark"
-        );
-
-    }
-
-});
-
-
-// ==========================
-// VOICE SYSTEM
-// ==========================
-
-const SpeechRecognition =
-    window.SpeechRecognition ||
-    window.webkitSpeechRecognition;
-
-let recognition = null;
-let isListening = false;
-let isSpeaking = false;
-
-
-// ==========================
-// VOICE INPUT
-// ==========================
-
-if (SpeechRecognition) {
-
-    recognition = new SpeechRecognition();
-
-    recognition.lang = "en-US";
-    recognition.continuous = false;
-    recognition.interimResults = false;
-
-
-    recognition.onstart = function () {
-
-        isListening = true;
-
-        console.log("🎤 Peter is listening...");
-
-        if (voiceBtn) {
-            voiceBtn.innerHTML =
-                '<i class="fa-solid fa-stop"></i>';
-        }
-
-    };
-
-
-    recognition.onresult = function (event) {
-
-        console.log("🎤 Speech result received!");
-
-        const speech =
-            event.results[0][0].transcript.trim();
-
-        console.log("🗣️ You said:", speech);
-
-        if (!speech) return;
-
-        input.value = speech;
-
-        // Give the browser a moment
-        setTimeout(() => {
-
-            sendMessage();
-
-        }, 300);
-
-    };
-
-
-    recognition.onerror = function (event) {
-
-        console.error(
-            "🎤 Speech recognition error:",
-            event.error
-        );
-
-    };
-
-
-    recognition.onend = function () {
-
-        isListening = false;
-
-        console.log("🎤 Listening stopped.");
-
-        if (voiceBtn) {
-            voiceBtn.innerHTML =
-                '<i class="fa-solid fa-microphone"></i>';
-        }
-
-    };
+    updateThemeButton();
 
 }
 
 
-// ==========================
-// START / STOP LISTENING
-// ==========================
+function updateThemeButton() {
+
+    const light =
+        document.body.classList.contains(
+            "light"
+        );
+
+
+    if (light) {
+
+        themeBtn.innerHTML = `
+            <i class="fa-solid fa-sun"></i>
+            <span>Light mode</span>
+        `;
+
+    }
+    else {
+
+        themeBtn.innerHTML = `
+            <i class="fa-solid fa-moon"></i>
+            <span>Dark mode</span>
+        `;
+
+    }
+
+}
+
+
+/* =========================================
+   TEXTAREA
+========================================= */
+
+function setupTextarea() {
+
+    input.addEventListener(
+        "input",
+        () => {
+
+            input.style.height =
+                "auto";
+
+
+            input.style.height =
+                Math.min(
+                    input.scrollHeight,
+                    150
+                ) + "px";
+
+        }
+    );
+
+
+    input.addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                event.key === "Enter" &&
+                !event.shiftKey
+            ) {
+
+                event.preventDefault();
+
+                sendMessage();
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================
+   SEND
+========================================= */
+
+sendBtn.addEventListener(
+    "click",
+    sendMessage
+);
+
+
+/* =========================================
+   SEND MESSAGE
+========================================= */
+
+async function sendMessage() {
+
+    if (isSending) return;
+
+
+    const text =
+        input.value.trim();
+
+
+    if (
+        !text &&
+        !selectedFile
+    ) {
+
+        return;
+
+    }
+
+
+    isSending =
+        true;
+
+
+    sendBtn.disabled =
+        true;
+
+
+    welcome.style.display =
+        "none";
+
+
+    if (text) {
+
+        addMessage(
+            "user",
+            text
+        );
+
+    }
+
+
+    const fileToSend =
+        selectedFile;
+
+
+    input.value =
+        "";
+
+
+    input.style.height =
+        "auto";
+
+
+    selectedFile =
+        null;
+
+
+    fileInput.value =
+        "";
+
+
+    updateFilePreview();
+
+
+    const typingId =
+        showTyping();
+
+
+    try {
+
+        let response;
+
+
+        /* =====================================
+           FILE
+        ===================================== */
+
+        if (fileToSend) {
+
+            const formData =
+                new FormData();
+
+
+            formData.append(
+                "file",
+                fileToSend
+            );
+
+
+            formData.append(
+                "message",
+                text
+            );
+
+
+            response =
+                await fetch(
+                    "/upload",
+                    {
+                        method:
+                            "POST",
+
+                        body:
+                            formData
+                    }
+                );
+
+        }
+
+
+        /* =====================================
+           NORMAL CHAT
+        ===================================== */
+
+        else {
+
+            response =
+                await fetch(
+                    "/chat",
+                    {
+                        method:
+                            "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body:
+                            JSON.stringify({
+                                message:
+                                    text
+                            })
+                    }
+                );
+
+        }
+
+
+        removeTyping(
+            typingId
+        );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Server error: " +
+                response.status
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        const reply =
+            data.reply ||
+            data.message ||
+            data.response ||
+            "Peter didn't return a response.";
+
+
+        addMessage(
+            "ai",
+            reply
+        );
+
+
+        saveChat();
+
+
+        /* VOICE RESPONSE */
+
+        if (
+            voiceMode.classList.contains(
+                "active"
+            )
+        ) {
+
+            speakText(
+                reply
+            );
+
+        }
+
+    }
+    catch (error) {
+
+        console.error(
+            "Peter error:",
+            error
+        );
+
+
+        removeTyping(
+            typingId
+        );
+
+
+        addMessage(
+            "ai",
+            "Sorry, I couldn't connect to Peter's server. Please make sure your server is running."
+        );
+
+
+        if (
+            voiceMode.classList.contains(
+                "active"
+            )
+        ) {
+
+            hideVoiceMode();
+
+        }
+
+    }
+    finally {
+
+        isSending =
+            false;
+
+
+        sendBtn.disabled =
+            false;
+
+
+        input.focus();
+
+    }
+
+}
+
+
+/* =========================================
+   ADD MESSAGE
+========================================= */
+
+function addMessage(
+    role,
+    text
+) {
+
+    const message =
+        document.createElement(
+            "div"
+        );
+
+
+    message.className =
+        `message ${role}`;
+
+
+    const avatar =
+        document.createElement(
+            "div"
+        );
+
+
+    avatar.className =
+        "message-avatar";
+
+
+    if (
+        role === "ai"
+    ) {
+
+        avatar.textContent =
+            "P";
+
+    }
+    else {
+
+        avatar.innerHTML =
+            '<i class="fa-solid fa-user"></i>';
+
+    }
+
+
+    const content =
+        document.createElement(
+            "div"
+        );
+
+
+    content.className =
+        "message-content";
+
+
+    content.innerHTML =
+        formatMessage(
+            text
+        );
+
+
+    message.appendChild(
+        avatar
+    );
+
+
+    message.appendChild(
+        content
+    );
+
+
+    messages.appendChild(
+        message
+    );
+
+
+    scrollToBottom();
+
+}
+
+
+/* =========================================
+   FORMAT MESSAGE
+========================================= */
+
+function formatMessage(
+    text
+) {
+
+    if (!text) {
+        return "";
+    }
+
+
+    let escaped =
+        escapeHtml(
+            text
+        );
+
+
+    escaped =
+        escaped.replace(
+            /```([\s\S]*?)```/g,
+            (match, code) => {
+
+                return `
+                    <div class="code-block">
+                        <pre>${code.trim()}</pre>
+                    </div>
+                `;
+
+            }
+        );
+
+
+    escaped =
+        escaped.replace(
+            /\*\*(.*?)\*\*/g,
+            "<strong>$1</strong>"
+        );
+
+
+    escaped =
+        escaped.replace(
+            /\*(.*?)\*/g,
+            "<em>$1</em>"
+        );
+
+
+    escaped =
+        escaped.replace(
+            /\n/g,
+            "<br>"
+        );
+
+
+    return escaped;
+
+}
+
+
+function escapeHtml(
+    text
+) {
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+
+    div.textContent =
+        text;
+
+
+    return div.innerHTML;
+
+}
+
+
+/* =========================================
+   TYPING
+========================================= */
+
+function showTyping() {
+
+    const id =
+        "typing-" +
+        Date.now();
+
+
+    const message =
+        document.createElement(
+            "div"
+        );
+
+
+    message.className =
+        "message ai";
+
+
+    message.id =
+        id;
+
+
+    message.innerHTML = `
+        <div class="message-avatar">
+            P
+        </div>
+
+        <div class="message-content">
+
+            <div class="typing">
+
+                <span></span>
+                <span></span>
+                <span></span>
+
+            </div>
+
+        </div>
+    `;
+
+
+    messages.appendChild(
+        message
+    );
+
+
+    scrollToBottom();
+
+
+    return id;
+
+}
+
+
+function removeTyping(
+    id
+) {
+
+    const element =
+        document.getElementById(
+            id
+        );
+
+
+    if (element) {
+
+        element.remove();
+
+    }
+
+}
+
+
+/* =========================================
+   SCROLL
+========================================= */
+
+function scrollToBottom() {
+
+    setTimeout(
+        () => {
+
+            const chatArea =
+                document.getElementById(
+                    "chat-area"
+                );
+
+
+            chatArea.scrollTo(
+                {
+                    top:
+                        chatArea.scrollHeight,
+
+                    behavior:
+                        "smooth"
+                }
+            );
+
+        },
+        50
+    );
+
+}
+
+
+/* =========================================
+   SUGGESTIONS
+========================================= */
+
+function setupSuggestions() {
+
+    document
+        .querySelectorAll(
+            ".suggestion"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        input.value =
+                            button.dataset.prompt;
+
+
+                        input.focus();
+
+
+                        input.dispatchEvent(
+                            new Event(
+                                "input"
+                            )
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+}
+
+
+/* =========================================
+   FILE UPLOAD
+========================================= */
+
+attachBtn.addEventListener(
+    "click",
+    () => {
+
+        fileInput.click();
+
+    }
+);
+
+
+fileInput.addEventListener(
+    "change",
+    () => {
+
+        const file =
+            fileInput.files[0];
+
+
+        if (!file) return;
+
+
+        if (
+            file.size >
+            10 * 1024 * 1024
+        ) {
+
+            alert(
+                "File is too large. Maximum size is 10 MB."
+            );
+
+
+            fileInput.value =
+                "";
+
+
+            return;
+
+        }
+
+
+        selectedFile =
+            file;
+
+
+        updateFilePreview();
+
+    }
+);
+
+
+function updateFilePreview() {
+
+    if (!selectedFile) {
+
+        filePreview.innerHTML =
+            "";
+
+        return;
+
+    }
+
+
+    filePreview.innerHTML = `
+        <div class="file-item">
+
+            <i class="fa-solid fa-file"></i>
+
+            <span>
+                ${escapeHtml(
+                    selectedFile.name
+                )}
+            </span>
+
+            <button
+                id="remove-file"
+                title="Remove file"
+            >
+
+                <i class="fa-solid fa-xmark"></i>
+
+            </button>
+
+        </div>
+    `;
+
+
+    document
+        .getElementById(
+            "remove-file"
+        )
+        .addEventListener(
+            "click",
+            () => {
+
+                selectedFile =
+                    null;
+
+
+                fileInput.value =
+                    "";
+
+
+                updateFilePreview();
+
+            }
+        );
+
+}
+
+
+/* =========================================
+   SAVE CHAT
+========================================= */
+
+function saveChat() {
+
+    localStorage.setItem(
+        "peter-chat",
+        messages.innerHTML
+    );
+
+}
+
+
+function loadChat() {
+
+    const saved =
+        localStorage.getItem(
+            "peter-chat"
+        );
+
+
+    if (saved) {
+
+        messages.innerHTML =
+            saved;
+
+
+        welcome.style.display =
+            "none";
+
+    }
+
+}
+
+
+/* =========================================
+   VOICE
+========================================= */
+
+function setupVoice() {
+
+    const SpeechRecognition =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
+
+
+    if (!SpeechRecognition) {
+
+        console.warn(
+            "Speech recognition is not supported."
+        );
+
+        return;
+
+    }
+
+
+    recognition =
+        new SpeechRecognition();
+
+
+    recognition.continuous =
+        false;
+
+
+    recognition.interimResults =
+        true;
+
+
+    recognition.lang =
+        "en-US";
+
+
+    recognition.onstart =
+        () => {
+
+            isListening =
+                true;
+
+
+            showVoiceMode();
+
+
+            setVoiceListening();
+
+        };
+
+
+    recognition.onresult =
+        event => {
+
+            let transcript =
+                "";
+
+
+            for (
+                let i =
+                    event.resultIndex;
+
+                i <
+                    event.results.length;
+
+                i++
+            ) {
+
+                transcript +=
+                    event.results[i][0]
+                        .transcript;
+
+            }
+
+
+            input.value =
+                transcript;
+
+
+            input.dispatchEvent(
+                new Event(
+                    "input"
+                )
+            );
+
+        };
+
+
+    recognition.onerror =
+        event => {
+
+            console.error(
+                "Voice error:",
+                event.error
+            );
+
+
+            isListening =
+                false;
+
+
+            if (
+                event.error ===
+                "not-allowed"
+            ) {
+
+                setVoiceError(
+                    "Microphone permission denied."
+                );
+
+            }
+            else {
+
+                setVoiceError(
+                    "Voice input failed."
+                );
+
+            }
+
+
+            setTimeout(
+                () => {
+
+                    if (!isSpeaking) {
+
+                        hideVoiceMode();
+
+                    }
+
+                },
+                1500
+            );
+
+        };
+
+
+    recognition.onend =
+        () => {
+
+            isListening =
+                false;
+
+
+            if (
+                input.value.trim()
+            ) {
+
+                setVoiceThinking();
+
+
+                sendMessage();
+
+            }
+            else {
+
+                hideVoiceMode();
+
+            }
+
+        };
+
+}
+
+
+/* =========================================
+   START VOICE
+========================================= */
+
+voiceBtn.addEventListener(
+    "click",
+    startListening
+);
+
 
 function startListening() {
 
     if (!recognition) {
 
         alert(
-            "Your browser does not support voice recognition."
+            "Voice recognition is not supported by this browser. Try Chrome or Edge."
         );
 
         return;
 
     }
 
+
     if (isListening) {
-
-        recognition.stop();
-
         return;
+    }
+
+
+    if (
+        "speechSynthesis"
+        in window
+    ) {
+
+        speechSynthesis.cancel();
 
     }
 
-    // Stop Peter talking
-    stopSpeaking();
+
+    showVoiceMode();
+
+
+    setVoiceListening();
+
 
     try {
 
         recognition.start();
 
-    } catch (error) {
+    }
+    catch (error) {
 
-        console.error(
-            "🎤 Microphone error:",
-            error
+        console.log(
+            "Recognition already active."
         );
 
     }
@@ -572,157 +1405,356 @@ function startListening() {
 }
 
 
-// ==========================
-// MAIN VOICE BUTTON
-// ==========================
+/* =========================================
+   STOP VOICE
+========================================= */
 
-if (voiceBtn) {
+stopVoiceBtn.addEventListener(
+    "click",
+    stopListening
+);
 
-    voiceBtn.addEventListener("click", function () {
 
-        if (isSpeaking) {
+function stopListening() {
 
-            stopSpeaking();
+    isListening =
+        false;
 
-        } else {
 
-            startListening();
+    if (recognition) {
+
+        try {
+
+            recognition.stop();
 
         }
+        catch {}
 
-    });
+    }
+
+
+    if (
+        "speechSynthesis"
+        in window
+    ) {
+
+        speechSynthesis.cancel();
+
+    }
+
+
+    isSpeaking =
+        false;
+
+
+    hideVoiceMode();
 
 }
 
 
-// ==========================
-// SIDEBAR VOICE BUTTON
-// ==========================
+/* =========================================
+   SHOW VOICE
+========================================= */
 
-if (voiceSidebarBtn) {
+function showVoiceMode() {
 
-    voiceSidebarBtn.addEventListener(
-        "click",
-        startListening
+    voiceMode.classList.add(
+        "active"
     );
 
+
+    if (composer) {
+
+        composer.style.opacity =
+            ".1";
+
+    }
+
+
+    if (composerWrapper) {
+
+        composerWrapper.style.pointerEvents =
+            "none";
+
+    }
+
 }
 
 
-// ==========================
-// PETER SPEAKS
-// ==========================
+/* =========================================
+   HIDE VOICE
+========================================= */
 
-function speakReply(text) {
+function hideVoiceMode() {
 
-    if (!("speechSynthesis" in window)) {
+    voiceMode.classList.remove(
+        "active"
+    );
 
-        console.log(
-            "🔊 Speech synthesis is not supported."
-        );
+
+    voiceMode.classList.remove(
+        "ai-speaking"
+    );
+
+
+    if (composer) {
+
+        composer.style.opacity =
+            "";
+
+    }
+
+
+    if (composerWrapper) {
+
+        composerWrapper.style.pointerEvents =
+            "";
+
+    }
+
+}
+
+
+/* =========================================
+   VOICE STATES
+========================================= */
+
+function setVoiceListening() {
+
+    voiceMode.classList.remove(
+        "ai-speaking"
+    );
+
+
+    voiceStatusTitle.textContent =
+        "Listening";
+
+
+    voiceStatusText.textContent =
+        "Speak to Peter...";
+
+}
+
+
+function setVoiceThinking() {
+
+    voiceMode.classList.remove(
+        "ai-speaking"
+    );
+
+
+    voiceStatusTitle.textContent =
+        "Thinking";
+
+
+    voiceStatusText.textContent =
+        "Peter is processing your request...";
+
+}
+
+
+function setVoiceError(
+    message
+) {
+
+    voiceMode.classList.remove(
+        "ai-speaking"
+    );
+
+
+    voiceStatusTitle.textContent =
+        "Oops";
+
+
+    voiceStatusText.textContent =
+        message;
+
+}
+
+
+/* =========================================
+   PETER SPEAKING
+========================================= */
+
+function showSpeakingAnimation() {
+
+    showVoiceMode();
+
+
+    voiceMode.classList.add(
+        "ai-speaking"
+    );
+
+
+    voiceStatusTitle.textContent =
+        "Peter is speaking";
+
+
+    voiceStatusText.textContent =
+        "I'm listening if you want to talk...";
+
+}
+
+
+/* =========================================
+   TEXT TO SPEECH
+========================================= */
+
+function speakText(
+    text
+) {
+
+    if (
+        !("speechSynthesis" in window)
+    ) {
+
+        hideVoiceMode();
 
         return;
 
     }
 
-    window.speechSynthesis.cancel();
 
-    const cleanText = text
-        .replace(/[*_#`]/g, "")
-        .trim();
+    speechSynthesis.cancel();
 
-    if (!cleanText) return;
+
+    const cleanText =
+        text
+            .replace(
+                /```[\s\S]*?```/g,
+                ""
+            )
+            .replace(
+                /[*#`]/g,
+                ""
+            )
+            .replace(
+                /<[^>]*>/g,
+                ""
+            );
+
+
+    if (
+        !cleanText.trim()
+    ) {
+
+        hideVoiceMode();
+
+        return;
+
+    }
+
 
     const utterance =
         new SpeechSynthesisUtterance(
             cleanText
         );
 
-    utterance.lang = "en-US";
-    utterance.rate = 0.95;
-    utterance.pitch = 1;
-    utterance.volume = 1;
+
+    utterance.rate =
+        1;
 
 
-    utterance.onstart = function () {
-
-        isSpeaking = true;
-
-        console.log(
-            "🔊 Peter is speaking..."
-        );
-
-    };
+    utterance.pitch =
+        1.03;
 
 
-    utterance.onend = function () {
-
-        isSpeaking = false;
-
-        console.log(
-            "🔊 Peter finished speaking."
-        );
-
-    };
+    utterance.volume =
+        1;
 
 
-    utterance.onerror = function (event) {
+    utterance.onstart =
+        () => {
 
-        isSpeaking = false;
-
-        console.error(
-            "🔊 Speech error:",
-            event.error
-        );
-
-    };
+            isSpeaking =
+                true;
 
 
-    window.speechSynthesis.speak(
+            showSpeakingAnimation();
+
+        };
+
+
+    utterance.onend =
+        () => {
+
+            isSpeaking =
+                false;
+
+
+            voiceMode.classList.remove(
+                "ai-speaking"
+            );
+
+
+            voiceStatusTitle.textContent =
+                "Ready";
+
+
+            voiceStatusText.textContent =
+                "Tap the microphone to speak again.";
+
+
+            setTimeout(
+                () => {
+
+                    if (
+                        !isListening &&
+                        !isSpeaking
+                    ) {
+
+                        hideVoiceMode();
+
+                    }
+
+                },
+                1200
+            );
+
+        };
+
+
+    utterance.onerror =
+        () => {
+
+            isSpeaking =
+                false;
+
+
+            hideVoiceMode();
+
+        };
+
+
+    speechSynthesis.speak(
         utterance
     );
 
 }
 
-// ==========================
-// STOP PETER SPEAKING
-// ==========================
 
-function stopSpeaking() {
+/* =========================================
+   WINDOW RESIZE
+========================================= */
 
-    if ("speechSynthesis" in window) {
+window.addEventListener(
+    "resize",
+    () => {
 
-        window.speechSynthesis.cancel();
+        if (
+            window.innerWidth > 800
+        ) {
 
-        isSpeaking = false;
+            sidebar.classList.remove(
+                "open"
+            );
 
-        console.log("🔇 Peter stopped speaking.");
+            sidebarOverlay.classList.remove(
+                "active"
+            );
 
-    }
-
-}
-
-
-// ==========================
-// ESCAPE KEY
-// ==========================
-
-document.addEventListener(
-    "keydown",
-    function (event) {
-
-        if (event.key === "Escape") {
-
-            stopSpeaking();
-
-            if (
-                recognition &&
-                isListening
-            ) {
-
-                recognition.stop();
-
-            }
+            sidebar.style.display =
+                "";
 
         }
 
